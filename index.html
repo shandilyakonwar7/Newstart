@@ -4,29 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Be My Valentine?</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         body {
+            margin: 0;
+            height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
-            margin: 0;
+            background-color: #ffe6e6; /* Light pink background */
             font-family: 'Arial', sans-serif;
-            background-color: #ffe6e6;
-            overflow: hidden;
+            overflow: hidden; /* Keeps everything clean */
         }
-        h1 { color: #ff4d6d; text-align: center; margin-bottom: 30px; }
-        
-        /* This box keeps them side-by-side at the start */
-        .container {
-            display: flex;
+
+        h1 { 
+            color: #ff4d6d; 
+            text-align: center; 
+            margin-bottom: 30px;
+            padding: 0 20px;
+        }
+
+        .container { 
+            display: flex; 
+            gap: 20px; 
             justify-content: center;
             align-items: center;
-            gap: 20px;
             width: 100%;
-            height: 50px;
-            position: relative;
         }
 
         button {
@@ -35,49 +39,80 @@
             border: none;
             border-radius: 10px;
             cursor: pointer;
-            transition: 0.1s;
+            font-weight: bold;
+            transition: transform 0.1s;
         }
 
-        #yesBtn { background-color: #ff4d6d; color: white; }
-        
+        #yesBtn { 
+            background-color: #ff4d6d; 
+            color: white; 
+            box-shadow: 0 4px 15px rgba(255, 77, 109, 0.3);
+        }
+
         #noBtn { 
             background-color: #adb5bd; 
-            color: white;
-            z-index: 999; /* Ensures it stays visible when moving */
+            color: white; 
+            position: relative; /* Starts in the row */
+            z-index: 999;
         }
     </style>
 </head>
 <body>
 
-    <h1>Will you be my Valentine? ❤️</h1>
+    <h1 id="question">Will you be my Valentine? ❤️</h1>
     
-    <div class="container">
-        <button id="yesBtn" onclick="alert('Yay! See you on the 14th! 🥰')">Yes</button>
+    <div id="buttonContainer" class="container">
+        <button id="yesBtn">Yes</button>
         <button id="noBtn">No</button>
     </div>
 
     <script>
         const noBtn = document.getElementById('noBtn');
+        const yesBtn = document.getElementById('yesBtn');
+        const question = document.getElementById('question');
+        const buttonContainer = document.getElementById('buttonContainer');
 
         const moveButton = () => {
-            // Once touched, the button becomes 'absolute' and jumps away
-            noBtn.style.position = 'absolute';
+            // Switch to fixed so it can fly over everything
+            noBtn.style.position = 'fixed'; 
             
-            // Keeps the button within the phone screen boundaries
-            const x = Math.random() * (window.innerWidth - noBtn.offsetWidth - 40) + 20;
-            const y = Math.random() * (window.innerHeight - noBtn.offsetHeight - 40) + 20;
+            // Safety margin (pixels)
+            const padding = 20; 
             
-            noBtn.style.left = x + "px";
-            noBtn.style.top = y + "px";
+            // Calculate random spots while keeping the button fully visible
+            const maxWidth = window.innerWidth - noBtn.offsetWidth - padding;
+            const maxHeight = window.innerHeight - noBtn.offsetHeight - padding;
+            
+            const randomX = Math.floor(Math.random() * (maxWidth - padding)) + padding;
+            const randomY = Math.floor(Math.random() * (maxHeight - padding)) + padding;
+            
+            noBtn.style.left = randomX + 'px';
+            noBtn.style.top = randomY + 'px';
         };
 
-        // Listen for both mouse hover and mobile touch
+        // Desktop escape
         noBtn.addEventListener('mouseover', moveButton);
+        
+        // Mobile escape
         noBtn.addEventListener('touchstart', (e) => {
-            e.preventDefault(); // This is the magic line for mobile!
+            e.preventDefault(); // Prevents the click from landing
             moveButton();
         });
-    </script>
 
+        // The Success Moment
+        yesBtn.addEventListener('click', () => {
+            question.innerHTML = "Yay! See you on the 14th! 🥰";
+            buttonContainer.style.display = 'none'; // Hide the Yes button
+            noBtn.style.display = 'none'; // Hide the No button
+            
+            // Launch Confetti
+            confetti({
+                particleCount: 150,
+                spread: 70,
+                origin: { y: 0.6 },
+                colors: ['#ff4d6d', '#ffafcc', '#ffffff']
+            });
+        });
+    </script>
 </body>
 </html>
